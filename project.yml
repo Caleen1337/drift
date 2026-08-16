@@ -1,0 +1,30 @@
+name: Drift
+options:
+  bundleIdPrefix: com.drift
+  deploymentTarget:
+    iOS: "17.0"
+packages:
+  DiscoveryCore:
+    path: Core
+schemes:
+  Drift:
+    build:
+      targets:
+        Drift: all
+    run:
+      config: Debug
+targets:
+  Drift:
+    type: application
+    platform: iOS
+    sources:
+      - path: iOS/Drift
+    dependencies:
+      - package: DiscoveryCore
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.drift.app
+        TARGETED_DEVICE_FAMILY: "1"
+        SWIFT_VERSION: "5.9"
+        CODE_SIGNING_ALLOWED: "NO"
+        INFOPLIST_FILE: iOS/Drift/Info.plist

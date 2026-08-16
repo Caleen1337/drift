@@ -1,0 +1,2 @@
+lightfm>=1.17
+numpy>=1.26

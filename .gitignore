@@ -1,0 +1,28 @@
+# macOS
+.DS_Store
+
+# Xcode
+xcuserdata/
+DerivedData/
+*.xcworkspace
+*.xcodeproj
+*.ipa
+*.dSYM.zip
+
+# SwiftPM
+.build/
+.swiftpm/
+
+# Python
+__pycache__/
+*.pyc
+venv/
+.venv/
+
+# Data / secrets
+*.db
+*.sqlite
+*.sqlite3
+.env
+secrets/
+*.json.key

@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Discovery Lab</title>
+<style>
+  :root {
+    --bg: #0e0f15;
+    --surface: #191b24;
+    --surface-high: #22242f;
+    --text: #eef0f6;
+    --muted: #8b90a0;
+    --accent: #7accff;
+    --accent2: #8c6bf0;
+    --warm: #fa8c72;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; padding: 24px; }
+  h1 { font-size: 22px; margin-bottom: 20px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; margin-bottom: 24px; }
+  .card { background: var(--surface); border-radius: 14px; padding: 18px; }
+  .card .label { color: var(--muted); font-size: 13px; margin-bottom: 8px; }
+  .card .value { font-size: 28px; font-weight: 700; }
+  .card .value.accent { color: var(--accent); }
+  h2 { font-size: 15px; margin: 18px 0 10px; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; }
+  table { width: 100%; border-collapse: collapse; background: var(--surface); border-radius: 14px; overflow: hidden; }
+  th, td { text-align: left; padding: 10px 14px; font-size: 13px; border-bottom: 1px solid var(--surface-high); }
+  th { color: var(--muted); font-weight: 600; }
+  .bar-wrap { background: var(--surface-high); border-radius: 6px; height: 8px; overflow: hidden; }
+  .bar { height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent2)); border-radius: 6px; }
+  .row { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+  .row .name { width: 140px; font-size: 13px; }
+  .row .bar-wrap { flex: 1; }
+  .row .pct { width: 48px; text-align: right; font-size: 13px; color: var(--muted); }
+</style>
+</head>
+<body>
+  <h1>Discovery Lab</h1>
+  <div class="grid" id="cards"></div>
+
+  <h2>Events by type</h2>
+  <div id="byType"></div>
+
+  <h2>Recent events</h2>
+  <table>
+    <thead><tr><th>time</th><th>type</th><th>track</th><th>artist</th><th>source</th></tr></thead>
+    <tbody id="events"></tbody>
+  </table>
+
+<script>
+async function load() {
+  try {
+    const [m, e] = await Promise.all([
+      fetch('/metrics').then(r => r.json()),
+      fetch('/events?limit=50').then(r => r.json())
+    ]);
+
+    document.getElementById('cards').innerHTML = `
+      <div class="card"><div class="label">Users</div><div class="value accent">${m.users}</div></div>
+      <div class="card"><div class="label">Events</div><div class="value">${m.totalEvents}</div></div>
+      <div class="card"><div class="label">Event types</div><div class="value accent">${Object.keys(m.byType).length}</div></div>
+    `;
+
+    const max = Math.max(1, ...Object.values(m.byType));
+    document.getElementById('byType').innerHTML = Object.entries(m.byType)
+      .sort((a, b) => b[1] - a[1])
+      .map(([k, v]) => `
+        <div class="row">
+          <div class="name">${k}</div>
+          <div class="bar-wrap"><div class="bar" style="width:${(v / max) * 100}%"></div></div>
+          <div class="pct">${v}</div>
+        </div>`)
+      .join('');
+
+    document.getElementById('events').innerHTML = e.map(ev => `
+      <tr>
+        <td>${(ev.timestamp || '').slice(11, 19)}</td>
+        <td>${ev.type}</td>
+        <td>${ev.track_id}</td>
+        <td>${ev.artist_id}</td>
+        <td>${ev.source}</td>
+      </tr>`).join('');
+  } catch (err) {
+    document.getElementById('cards').textContent = 'Backend not reachable: ' + err;
+  }
+}
+load();
+</script>
+</body>
+</html>
