@@ -27,4 +27,12 @@ targets:
         TARGETED_DEVICE_FAMILY: "1"
         SWIFT_VERSION: "5.9"
         CODE_SIGNING_ALLOWED: "NO"
-        INFOPLIST_FILE: iOS/Drift/Info.plist
+    info:
+      path: iOS/Drift/Info.plist
+      properties:
+        UILaunchScreen: {}
+        UIBackgroundModes:
+          - audio
+        NSAppTransportSecurity:
+          NSAllowsArbitraryLoads: true
+        CFBundleDisplayName: Drift
